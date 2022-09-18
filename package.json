@@ -6,7 +6,7 @@
     "files": [
         "./dist"
     ],
-    "private": true,
+    "license": "MIT",
     "scripts": {
         "build": "NODE_ENV=development tsc",
         "release": "tsc"
