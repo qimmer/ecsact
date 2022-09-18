@@ -1,6 +1,6 @@
 import {JSONPath} from "jsonpath-plus";
-import {assert} from "./Assert";
 import {EntityReservedMembers} from "../IEntity";
+import {assert} from "@src/Util/Assert";
 
 export function resolveJsonPaths(root:any, object?:any, resolvedList?:Set<any>) {
     resolvedList = (typeof resolvedList === "undefined") ? new Set() : resolvedList;

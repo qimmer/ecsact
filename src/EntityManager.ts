@@ -1,8 +1,8 @@
-import {IEntityManager} from "./IEntityManager";
-import {EntityQuery} from "./EntityQuery";
-import {EntityReservedMembers, IEntity, IEntityInternal} from "./IEntity";
+import {IEntityManager} from "@src/IEntityManager";
+import {EntityQuery} from "@src/EntityQuery";
+import {EntityReservedMembers, IEntity, IEntityInternal} from "@src/IEntity";
 import {JSONPath} from "jsonpath-plus";
-import {IEntityQuery} from "./IEntityQuery";
+import {IEntityQuery} from "@src/IEntityQuery";
 import {ArchetypeManager} from "@src/ArchetypeManager";
 import {IArchetype} from "@src/IArchetype";
 

@@ -1,4 +1,4 @@
-import {IEntityManager} from "./IEntityManager";
+import {IEntityManager} from "@src/IEntityManager";
 import {IArchetype} from "@src/IArchetype";
 
 export interface IEntityInternal {

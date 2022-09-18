@@ -1,4 +1,4 @@
-import {IEntity, IEntityHelper, IEntityInternal} from "./IEntity";
+import {IEntity, IEntityHelper, IEntityInternal} from "@src/IEntity";
 import {IArchetype} from "@src/IArchetype";
 
 export interface IEntityQuery<T extends IEntity = IEntity> {

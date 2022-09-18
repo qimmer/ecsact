@@ -1,5 +1,5 @@
-import {IEntity} from "./IEntity";
-import {IEntityQuery} from "./IEntityQuery";
+import {IEntity} from "@src/IEntity";
+import {IEntityQuery} from "@src/IEntityQuery";
 
 export interface IEntityManager {
     set(entity: IEntity, data: Record<string, any>): void;

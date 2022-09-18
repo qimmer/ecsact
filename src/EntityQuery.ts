@@ -1,5 +1,5 @@
-import {IEntityQuery} from "./IEntityQuery";
-import {IEntity, IEntityHelper} from "./IEntity";
+import {IEntityQuery} from "@src/IEntityQuery";
+import {IEntity, IEntityHelper} from "@src/IEntity";
 import {IArchetype} from "@src/IArchetype";
 
 export class EntityQuery<T extends IEntity> implements IEntityQuery<T> {
