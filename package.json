@@ -1,11 +1,10 @@
 {
     "name": "ecsact",
     "version": "0.0.1",
-    "main": "./index.js",
-    "types": "./index.d.ts",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
     "files": [
-        "./index.*",
-        "./src"
+        "./dist"
     ],
     "private": true,
     "scripts": {
