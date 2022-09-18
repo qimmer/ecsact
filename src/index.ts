@@ -5,6 +5,5 @@ export * from "@src/IEntityQuery";
 export * from "@src/IEntityManager";
 export * from "@src/Util/JsonUtils";
 export * from "@src/Util/Assert";
-export * from "@src/Util/Math";
 export * from "@src/ArchetypeManager";
 export * from "@src/IArchetype";
