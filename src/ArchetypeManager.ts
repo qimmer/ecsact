@@ -1,6 +1,7 @@
 import {IEntity, IEntityInternal} from "@src/IEntity";
 import {InternalEntity} from "@src/EntityManager";
 import {IArchetype} from "@src/IArchetype";
+import {Filter, FilterFunc} from "@src/IEntityQuery";
 
 export class ArchetypeManager {
     private rootArchetype: IArchetype;
@@ -28,27 +29,34 @@ export class ArchetypeManager {
         this.archetypeChanges = [];
     }
 
-    getMatches(tags: ReadonlySet<string>): IArchetype[] {
-        return Object.values(this.archetypes).filter(archetype => this.matches(archetype, tags));
+    getMatches(filter: Filter): IArchetype[] {
+        return Object.values(this.archetypes).filter(archetype => this.matches(archetype, filter));
     }
 
-    matches(archetype: IArchetype, tags: ReadonlySet<string>): boolean {
+    matches(archetype: IArchetype, filter: Filter): boolean {
         let matches = true;
-        tags.forEach(tag => {
-            if (!matches) return;
 
-            if (tag[0] === "!") {
-                if (archetype.tags.has(tag.substring(1))) {
-                    matches = false;
-                    return;
+        if((<ReadonlySet<string>>filter).has !== undefined) {
+            let filterSet = <ReadonlySet<string>>filter;
+            filterSet.forEach(tag => {
+                if (!matches) return;
+
+                if (tag[0] === "!") {
+                    if (archetype.tags.has(tag.substring(1))) {
+                        matches = false;
+                        return;
+                    }
+                } else {
+                    if (!archetype.tags.has(tag)) {
+                        matches = false;
+                        return;
+                    }
                 }
-            } else {
-                if (!archetype.tags.has(tag)) {
-                    matches = false;
-                    return;
-                }
-            }
-        });
+            });
+        } else {
+            let filterFunc = <FilterFunc>filter;
+            return filterFunc(tag => archetype.tags.has(tag));
+        }
 
         return matches;
     }

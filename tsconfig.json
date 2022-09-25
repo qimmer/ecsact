@@ -13,7 +13,7 @@
       "@src/*": ["src/*"]
     },
     "declaration": true,                              /* Generate .d.ts files from TypeScript and JavaScript files in your project. */
-    "sourceMap": true,                                /* Create source map files for emitted JavaScript files. */
+    "inlineSourceMap": true,
     "removeComments": true,                           /* Disable emitting comments. */
     "noEmit": false,                                   /* Disable emitting files from a compilation. */
     "esModuleInterop": true,                             /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables `allowSyntheticDefaultImports` for type compatibility. */

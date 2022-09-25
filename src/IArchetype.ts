@@ -9,3 +9,7 @@ export interface IArchetype {
     removeEdges: Record<string, IArchetype>;
     queries: Set<EntityQuery<IEntity>>;
 }
+
+export interface IArchetypeHelper {
+    has(tag:string):boolean;
+}

@@ -5,3 +5,4 @@ export * from "@src/IEntityQuery";
 export * from "@src/IEntityManager";
 export * from "@src/ArchetypeManager";
 export * from "@src/IArchetype";
+export * from "@src/Util/Assert";

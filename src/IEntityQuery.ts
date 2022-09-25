@@ -1,7 +1,12 @@
 import {IEntity, IEntityHelper, IEntityInternal} from "@src/IEntity";
 import {IArchetype} from "@src/IArchetype";
 
+export type FilterFunc = (has:(tag:string)=>boolean)=>boolean;
+export type Filter = ReadonlySet<string>|FilterFunc;
+
 export interface IEntityQuery<T extends IEntity = IEntity> {
+
+
     forEach(callback: (entity:T) => void):void;
     map<R>(callback: (entity:T) => R):R[];
     filter(callback: (entity:T) => boolean):T[];
@@ -10,7 +15,7 @@ export interface IEntityQuery<T extends IEntity = IEntity> {
 
     addArchetype(archetype:IArchetype):void;
 
-    getTags(): ReadonlySet<string>;
+    getFilter(): Filter;
 
     toArray(): T[];
     hasAny():boolean;

@@ -2,7 +2,7 @@ import {IEntityManager} from "@src/IEntityManager";
 import {EntityQuery} from "@src/EntityQuery";
 import {EntityReservedMembers, IEntity, IEntityInternal} from "@src/IEntity";
 import {JSONPath} from "jsonpath-plus";
-import {IEntityQuery} from "@src/IEntityQuery";
+import {Filter, FilterFunc, IEntityQuery} from "@src/IEntityQuery";
 import {ArchetypeManager} from "@src/ArchetypeManager";
 import {IArchetype} from "@src/IArchetype";
 
@@ -22,7 +22,7 @@ export class EntityManager implements IEntityManager {
         property: string|number,
         path: string
     }[];
-    private queryMap: Record<string, IEntityQuery<IEntity>>;
+    private archetypes: IArchetype[];
 
     constructor() {
         this.archetypeManager = new ArchetypeManager();
@@ -32,7 +32,7 @@ export class EntityManager implements IEntityManager {
         this.pathEntityMap = {};
         this.idCounter = 0;
         this.unresolvedReferences = [];
-        this.queryMap = {};
+        this.archetypes = [];
 
         this.archetypeManager.onNewArchetype = archetype => this.onNewArchetype(archetype);
 
@@ -44,8 +44,9 @@ export class EntityManager implements IEntityManager {
     }
 
     private onNewArchetype(archetype:IArchetype) {
+        this.archetypes.push(archetype);
         this.queries.forEach(x => {
-            if(this.archetypeManager.matches(archetype, x.getTags())) {
+            if(this.archetypeManager.matches(archetype, x.getFilter())) {
                 x.addArchetype(archetype);
                 archetype.queries.add(x);
             }
@@ -60,8 +61,19 @@ export class EntityManager implements IEntityManager {
         return <T><any>(<EntityManager>this._entityManager).archetypeManager.remove(<IEntity><any>this, tag);
     }
 
-    private hasHelper<T>(this:IEntityInternal, tag:string) {
-        return this._archetype.tags.has(tag);
+    private hasHelper<T>(this:IEntityInternal, tag:string|string[]) {
+        if(Array.isArray(tag)) {
+            if(tag.every(t => this._archetype.tags.has(t))) {
+                return this;
+            }
+        } else {
+            if(this._archetype.tags.has(tag)) {
+                return this;
+            }
+        }
+
+
+        return null;
     }
 
     private setHelper<T>(this:IEntityInternal, data:any, overwrite?:boolean) {
@@ -101,12 +113,16 @@ export class EntityManager implements IEntityManager {
         return <IEntity>entity;
     }
 
-    private createQuery<T extends IEntity>(tags: ReadonlySet<string>) {
-        let query = new EntityQuery<T>(tags);
-        this.archetypeManager.getMatches(tags).forEach(archetype => {
-            archetype.queries.add(query);
-            query.addArchetype(archetype);
-        });
+    private createQuery<T extends IEntity>(filter: Filter) {
+        let query = new EntityQuery<T>(filter);
+
+        this.archetypes.forEach(archetype => {
+            if(this.archetypeManager.matches(archetype, filter)) {
+                archetype.queries.add(query);
+                query.addArchetype(archetype);
+            }
+        })
+
         this.queries.push(query);
         return query;
     }
@@ -134,7 +150,7 @@ export class EntityManager implements IEntityManager {
                 dest[key] = srcValue;
             } else if(srcValue.tags) {
                 if(destValue && !destValue._archetype) {
-                    destValue = dest[key] = this.child(''+key, owner).set(destValue, undefined, root);
+                    destValue = dest[key] = this.child(''+key, owner).set(destValue);
                 }
                 if(!destValue) {
                     destValue = this.child('' + key, owner);
@@ -239,12 +255,21 @@ export class EntityManager implements IEntityManager {
         return entity;
     }
 
-    query<T extends IEntity>(tags: ReadonlySet<string> | ReadonlyArray<string>): IEntityQuery<T> {
-        let queryKey = Array.from(tags).sort().join('|');
-        return <IEntityQuery<T>>(this.queryMap[queryKey] || (this.queryMap[queryKey] = this.createQuery<T>(new Set(tags))));
+    query<T extends IEntity>(filter: Filter|string[]): IEntityQuery<T> {
+        if(Array.isArray(filter)) {
+            return this.createQuery<T>(new Set(filter));
+        } else {
+            return this.createQuery<T>(filter);
+        }
     }
 
-    child(name: string, owner?: IEntity, existingEntity?: any) {
+    filter<T extends IEntity>(filter: Filter, callback:(entities:Set<T>)=>void) {
+        this.archetypeManager.getMatches(filter).forEach(archetype => {
+            callback(<Set<T>>archetype.entities);
+        });
+    }
+
+    child(name: string, owner?: IEntity, existingEntity?: any):IEntity {
         let partialEntity = <IEntityInternal>(existingEntity || {});
 
         if(existingEntity && (<IEntityInternal><any>existingEntity)._localId !== undefined) {

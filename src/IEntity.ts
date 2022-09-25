@@ -47,7 +47,7 @@ export interface IEntityHelper {
     unset<T extends IEntity = this>(values:Exclude<UnsetValues<T>, IEntityHelper>):IEntity&T&this;
     child(name?: string, existingEntity?:any):IEntity;
     destroy():void;
-    has(tag:string):boolean;
+    has<T extends IEntity = this>(tag:string|string[]):T|null;
     getTags():ReadonlySet<string>
     getName():string
     getOwner():IEntity|null

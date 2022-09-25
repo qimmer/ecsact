@@ -1,15 +1,15 @@
-import {IEntityQuery} from "@src/IEntityQuery";
+import {Filter, IEntityQuery} from "@src/IEntityQuery";
 import {IEntity, IEntityHelper} from "@src/IEntity";
 import {IArchetype} from "@src/IArchetype";
 
 export class EntityQuery<T extends IEntity> implements IEntityQuery<T> {
-    private tags: ReadonlySet<string>;
+    private queryFilter: Filter;
     private archetypes: IArchetype[];
     private addedSubscriptions: ((entity:IEntity)=>void)[];
     private removedSubscriptions: ((entity:IEntity)=>void)[];
 
-    constructor(tags:ReadonlySet<string>) {
-        this.tags = tags;
+    constructor(queryFilter:Filter) {
+        this.queryFilter = queryFilter;
         this.archetypes = [];
         this.addedSubscriptions = [];
         this.removedSubscriptions = [];
@@ -25,8 +25,8 @@ export class EntityQuery<T extends IEntity> implements IEntityQuery<T> {
         return result;
     }
 
-    getTags():ReadonlySet<string> {
-        return this.tags;
+    getFilter():Filter {
+        return this.queryFilter;
     }
 
     addArchetype(archetype: IArchetype): void {
@@ -65,7 +65,7 @@ export class EntityQuery<T extends IEntity> implements IEntityQuery<T> {
 
     singleton(): T {
         if(this.archetypes.reduce((acc, val) => acc + val.entities.size, 0) !== 1) {
-            throw new Error("Less or more than 1 instance of singleton with tags [" + Array.from(this.tags).join(', ') + "]!");
+            throw new Error("Less or more than 1 instance of singleton!");
         }
 
         return <T><any>this.archetypes.filter(x => x.entities.size > 0)[0].entities.keys().next().value;
@@ -81,6 +81,13 @@ export class EntityQuery<T extends IEntity> implements IEntityQuery<T> {
 
     subscribeAdded(callback: (entity: T) => void):IEntityQuery<T> {
         this.addedSubscriptions.push(<(entity: IEntity)=>void>callback);
+
+        this.archetypes.forEach(archetype => {
+            archetype.entities.forEach(entity => {
+                callback(<T>entity);
+            });
+        });
+
         return this;
     }
 
